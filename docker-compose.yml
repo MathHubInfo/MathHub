@@ -28,8 +28,6 @@ services:
     image: mathhub/frontend
 
     # Runs internally on port 8043
-    ports:
-      - "8043"
     networks:
       - mhinternal
   
@@ -45,8 +43,6 @@ services:
       - DJANGO_ALLOWED_HOSTS=*
 
     # Runs internally on port 80
-    ports:
-      - "80"
     networks:
       - mhinternal
   
@@ -62,8 +58,6 @@ services:
     command: "--no-auth -H unix:///var/run/docker.sock"
     
     # Runs internally on port 9000
-    ports:
-      - "9000"
     networks:
       - mhinternal
   
@@ -75,19 +69,16 @@ services:
     image: kwarc/mmt:${MMT_TAG:-devel}
 
     # runs internally on port 8080
-    ports:
-      - "8080"
     command: "-w server on 8080 0.0.0.0"
     networks:
       - mhinternal
 
     # store some mmt data
     volumes:
-      - mmt:/data/
+      - mmt:/content/
 
 networks:
   mhinternal:
-    internal: true
 
 volumes:
   mmt:
