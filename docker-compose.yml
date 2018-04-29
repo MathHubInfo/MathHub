@@ -1,0 +1,95 @@
+version: '3.6'
+
+services:
+
+
+  ##
+  ## The Compositor
+  ##
+
+  compositor:
+    image: mathhub/compositor
+
+    # runs externally on port 80
+    ports:
+      - "80:80"
+    networks:
+      - default
+      - mhinternal
+    depends_on:
+      - frontend
+      - admin
+      - portainer
+      - mmt
+  ##
+  ## The Frontend
+  ##
+  frontend:
+    image: mathhub/frontend
+
+    # Runs internally on port 8043
+    ports:
+      - "8043"
+    networks:
+      - mhinternal
+  
+  ##
+  ## The Admin Interface
+  ##
+  admin:
+    image: mathhub/admin
+    volumes:
+      - "admin:/data/"
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_ALLOWED_HOSTS=*
+
+    # Runs internally on port 80
+    ports:
+      - "80"
+    networks:
+      - mhinternal
+  
+  ##
+  ## Portainer
+  ##
+  portainer:
+    image: portainer/portainer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "portainer:/data/"
+    
+    command: "--no-auth -H unix:///var/run/docker.sock"
+    
+    # Runs internally on port 9000
+    ports:
+      - "9000"
+    networks:
+      - mhinternal
+  
+  ##
+  ## MMT
+  ##
+  mmt:
+    # default to the 'devel' tag
+    image: kwarc/mmt:${MMT_TAG:-devel}
+
+    # runs internally on port 8080
+    ports:
+      - "8080"
+    command: "-w server on 8080 0.0.0.0"
+    networks:
+      - mhinternal
+
+    # store some mmt data
+    volumes:
+      - mmt:/data/
+
+networks:
+  mhinternal:
+    internal: true
+
+volumes:
+  mmt:
+  admin:
+  portainer:
