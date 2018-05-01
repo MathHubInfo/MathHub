@@ -1,21 +1,67 @@
 version: '3.6'
 
 services:
+  ##
+  ## Nginx entry point
+  ##
+  nginx:
+    image: jwilder/nginx-proxy:${NGINX_PROXY_VERSION}
+    env_file:
+      - .config/nginx
+    
+    labels:
+      "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy": "true"
+    
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "nginx_dhparam:/etc/nginx/dhparam"
+      - "nginx_html:/usr/share/nginx/html"
+      - "nginx_vhost:/etc/nginx/vhost.d"
+      - "nginx_certs:/etc/nginx/certs"
+       
+    depends_on:
+    - compositor
+    
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - mhinternal
+      - default
+  
+  ##
+  ## Letsencrypt-Companion
+  ##
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:${PROXY_COMPANION_VERSION}
+    
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "nginx_dhparam:/etc/nginx/dhparam"
+      - "nginx_html:/usr/share/nginx/html"
+      - "nginx_vhost:/etc/nginx/vhost.d"
+      - "nginx_certs:/etc/nginx/certs"
 
+    depends_on:
+      - nginx
+    
+    networks:
+      - mhinternal
 
   ##
   ## The Compositor
   ##
 
   compositor:
-    image: mathhub/compositor
-
-    # runs externally on port 80
-    ports:
-      - "80:80"
+    image: mathhub/compositor:${COMPOSITOR_VERSION}
+    env_file:
+      - .config/compositor
+    environment:
+      - VIRTUAL_PORT=80
+    
     networks:
-      - default
       - mhinternal
+    
     depends_on:
       - frontend
       - admin
@@ -25,9 +71,8 @@ services:
   ## The Frontend
   ##
   frontend:
-    image: mathhub/frontend
-
-    # Runs internally on port 8043
+    image: mathhub/frontend:${FRONTEND_VERSION}
+    
     networks:
       - mhinternal
   
@@ -35,14 +80,15 @@ services:
   ## The Admin Interface
   ##
   admin:
-    image: mathhub/admin
+    image: mathhub/admin:${ADMIN_VERSION}
+    env_file:
+      - .config/admin
+    environment:
+      - DJANGO_ALLOWED_HOSTS=*
+    
     volumes:
       - "admin:/data/"
-    environment:
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DJANGO_ALLOWED_HOSTS=*
 
-    # Runs internally on port 80
     networks:
       - mhinternal
   
@@ -50,14 +96,14 @@ services:
   ## Portainer
   ##
   portainer:
-    image: portainer/portainer
+    image: portainer/portainer:${PORTAINER_VERSION}
+    
+    command: "--no-auth -H unix:///var/run/docker.sock"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - "portainer:/data/"
     
-    command: "--no-auth -H unix:///var/run/docker.sock"
-    
-    # Runs internally on port 9000
     networks:
       - mhinternal
   
@@ -65,17 +111,15 @@ services:
   ## MMT
   ##
   mmt:
-    # default to the 'devel' tag
-    image: kwarc/mmt:${MMT_TAG:-devel}
+    image: kwarc/mmt:${MMT_VERSION}
 
-    # runs internally on port 8080
     command: "-w server on 8080 0.0.0.0"
-    networks:
-      - mhinternal
 
-    # store some mmt data
     volumes:
       - mmt:/content/
+    
+    networks:
+      - mhinternal
 
 networks:
   mhinternal:
@@ -84,3 +128,7 @@ volumes:
   mmt:
   admin:
   portainer:
+  nginx_vhost:
+  nginx_certs:
+  nginx_html:
+  nginx_dhparam:

@@ -1,0 +1,96 @@
+#!/bin/bash
+
+function read_mathhub_domain_name() {
+    cat << EOF
+When running in a production setup, MathHub needs to know the domain
+name it is running under. Please either enter a domain name now, or
+leave it blank to use "localhost". 
+EOF
+
+    printf "MATHHUB_DOMAIN_NAME="
+    read MATHHUB_DOMAIN_NAME
+    if [ -z "$MATHHUB_DOMAIN_NAME" ]
+    then
+        MATHHUB_DOMAIN_NAME="localhost"
+    fi;
+    echo "export MATHHUB_DOMAIN_NAME=$MATHHUB_DOMAIN_NAME"
+}
+
+function read_mathhub_ssl_email() {
+    cat << EOF
+If SSL Certificates should be automatically retrieved, MathHub needs to
+know an email address to register a new Let’s Encrypt account under.
+Please note by entering an email address here, you implicitly agree to
+the Let’s Encrypt subscriber agreement currently found under
+https://letsencrypt.org/documents/2017.11.15-LE-SA-v1.2.pdf. 
+EOF
+
+    printf "MATHHUB_SSL_EMAIL="
+    read MATHHUB_SSL_EMAIL
+    echo "export MATHHUB_SSL_EMAIL=$MATHHUB_SSL_EMAIL"
+}
+
+function read_mathhub_secret_key() {
+    cat << EOF
+MathHub uses a secret key to safely encrypt session information. The
+production key should be kept strictly secret. Please either enter a
+secret key now, or leave it blank to use "not-production-ready" as a key
+for local development setups. 
+EOF
+
+    printf "MATHHUB_SECRET_KEY="
+    read MATHHUB_SECRET_KEY
+    if [ -z "$MATHHUB_SECRET_KEY" ]
+    then
+        MATHHUB_SECRET_KEY="not-production-ready"
+    fi;
+    echo "export MATHHUB_SECRET_KEY=$MATHHUB_SECRET_KEY"
+}
+
+function write_nginx_config() {
+    echo "DEFAULT_HOST=$MATHHUB_DOMAIN_NAME" > .config/nginx
+
+    echo "Wrote .config/nginx"
+}
+
+function write_compositor_config() {
+    echo "VIRTUAL_HOST=$MATHHUB_DOMAIN_NAME" > .config/compositor
+
+    if [ ! -z "$MATHHUB_SSL_EMAIL" ]; then
+        echo "LETSENCRYPT_HOST=$MATHHUB_DOMAIN_NAME" >> .config/compositor
+        echo "LETSENCRYPT_EMAIL=$MATHHUB_SSL_EMAIL"  >> .config/compositor
+    fi;
+
+    echo "Wrote .config/compositor"
+}
+
+function write_admin_config() {
+    echo "DJANGO_SECRET_KEY=$MATHHUB_SECRET_KEY" > .config/admin
+    
+    echo "Wrote .config/admin"
+}
+
+function main() {
+    echo "MATHHUB DOCKER CONFIGURATION"
+
+    echo ""
+    read_mathhub_domain_name
+
+    echo ""
+    read_mathhub_ssl_email
+
+    echo ""
+    read_mathhub_secret_key
+
+    echo ""
+    echo "WRITING CONFIGURATION"
+    
+    mkdir -p .config
+
+    write_nginx_config
+    write_compositor_config
+    write_admin_config
+    echo "Done. "
+}
+
+main

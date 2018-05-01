@@ -2,19 +2,49 @@
 
 The new version of the MathHub System, managed with Docker Compose. 
 
-## Usage
+It consists of several containers, which can roughly be split into two groups:
+
+- Docker Entry Point and Letsencrypt Setup
+    - [jwilder/nginx-proxy](https://github.com/jwilder/nginx-proxy) - entry point taking care of https -> http
+    - [jrcs/letsencrypt-nginx-proxy-companion](https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion) - Manages and renews letsencrypt certificates
+- MathHub System
+    - [mathhub/compositor](https://github.com/MathHubInfo/Compositor) - to delegate access to the containers below
+    - [mathhub/frontend](https://github.com/MathHubInfo/Frontend) - to provide a frontend for MathHub
+    - [kwarc/mmt](https://github.com/Uniformal/MMT) - to provide a backend for MathHub
+    - [mathhub/admin](https://github.com/MathHubInfo/Admin) - to provide an Admin interface
+    - [portainer/portainer](https://github.com/portainer/portainer) - to manage docker containers
+
+## Configuration
+
+This repository supports both a local and production setup. 
+All configuration is done via env files. 
+
+These can be interactively generated using the configure script:
 
 ```bash
-# Set a secret key which is used by the admin interface for login
-# Change some-super-secret-string to some secret
-echo "DJANGO_SECRET_KEY=some-super-secret-string" > .env
+./configure
+```
 
+For a local setup, it is safe to accept all defaults. 
+
+## Starting and Stopping
+
+After having configured appropriatly, you can start the setup as follows:
+
+```bash 
 # to start all the containers
 docker-compose up -d
 
 # to create an initial admin user
 docker-compose exec admin python manage.py createsuperuser
 
-# to stop the containers
+# to stop the containers, but keep state
 docker-compose down
+
+# to stop all containers and remove all state
+docker-compose down -v
 ```
+
+## License
+
+Licensed under GPL 3.0. 
