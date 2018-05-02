@@ -47,4 +47,4 @@ docker-compose down -v
 
 ## License
 
-Licensed under GPL 3.0. 
+Licensed under AGPL 3.0. 
