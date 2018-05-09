@@ -115,6 +115,9 @@ services:
 
     command: "-w server on 8080 0.0.0.0"
 
+    environment:
+      MMT_ARCHIVES: meta/inf smglom/helloworld MMT/LFX MMT/urtheories MMT/examples
+
     volumes:
       - mmt:/content/
     
