@@ -113,7 +113,7 @@ services:
   mmt:
     image: kwarc/mmt:${MMT_VERSION}
 
-    command: "-w server on 8080 0.0.0.0"
+    command: "-w --file /content/MathHub/meta/inf/mathhub.msl"
 
     environment:
       MMT_ARCHIVES: meta/inf smglom/helloworld MMT/LFX MMT/urtheories MMT/examples
