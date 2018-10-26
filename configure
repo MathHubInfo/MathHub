@@ -70,6 +70,12 @@ function write_admin_config() {
     echo "Wrote .config/admin"
 }
 
+function write_mmt_config() {
+    touch .conig/mmt
+
+    echo "Wrote .config/mmt"
+}
+
 function main() {
     echo "MATHHUB DOCKER CONFIGURATION"
 
@@ -90,6 +96,7 @@ function main() {
     write_nginx_config
     write_compositor_config
     write_admin_config
+    write_mmt_config
     echo "Done. "
 }
 

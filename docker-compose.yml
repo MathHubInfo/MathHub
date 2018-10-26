@@ -112,6 +112,8 @@ services:
   ##
   mmt:
     image: kwarc/mmt:${MMT_VERSION}
+    env_file:
+      - .config/mmt
 
     command: "-w --file /content/MathHub/meta/inf/mathhub.msl"
 
