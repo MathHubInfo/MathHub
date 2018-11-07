@@ -1,0 +1,22 @@
+## MathHub docker-compose configuration devel
+
+# Version for MMT
+MMT_VERSION=devel
+
+# Version for compositor
+COMPOSITOR_VERSION=latest
+
+# Version for  mathhub/frontend
+FRONTEND_VERSION=devel
+
+# Version for mathhub/admin
+ADMIN_VERSION=latest
+
+# Version for jwilder/nginx-proxy
+NGINX_PROXY_VERSION=alpine
+
+# Version for jrcs/letsencrypt-nginx-proxy-companion
+PROXY_COMPANION_VERSION=latest
+
+# Version for portainer
+PORTAINER_VERSION=latest

@@ -25,9 +25,14 @@ These can be interactively generated using the configure script:
 ./configure
 ```
 
-For a local setup, it is safe to accept all defaults. 
+This script re-uses existing configuration if available. 
+Furthermore, for a local setup, it is safe to accept all defaults. 
+
+**WARNING:** Always shut down MathHub before re-running the configuration script. 
 
 ## Starting and Stopping
+
+**WARNING:** Do not attempt to run any of these commands without having gone through the configure script first. 
 
 After having configured appropriatly, you can start the setup as follows:
 

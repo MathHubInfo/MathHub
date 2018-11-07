@@ -1,17 +1,67 @@
 #!/bin/bash
 
+#### Loading / Writing configuration
+
+function load_prev_config() {
+
+    # load the defaults from the file if it exists
+    if [ -f ".config/save" ]; then
+        source ".config/save";
+    
+    # else load some defaults
+    else
+        echo "No saved settings found, loading defaults for local development setup. "
+        SET_MATHHUB_PROFILE="latest"
+        SET_MATHHUB_DOMAIN_NAME="localhost"
+        SET_MATHHUB_SECRET_KEY="not-production-ready"
+    fi;
+}
+
+function save_current_config() {
+    {
+        echo "echo \"Loaded previous settings from $(date)\"";
+        echo "SET_MATHHUB_PROFILE=$MATHHUB_PROFILE"
+        echo "SET_MATHHUB_DOMAIN_NAME=$MATHHUB_DOMAIN_NAME";
+        echo "SET_MATHHUB_SSL_EMAIL=$MATHHUB_SSL_EMAIL";
+        echo "SET_MATHHUB_SECRET_KEY=$SET_MATHHUB_SECRET_KEY";
+    } > .config/save
+
+    echo "Wrote .config/save"
+}
+
+#### Reading configuration settings
+
+function read_mathhub_profile() {
+    cat << EOF
+MathHub can run in different so-called profiles. These determine which
+branches of the React Frontend and MMT Backend will be used. Please pick
+either "devel" or "latest" now use leave this question blank to use
+"$SET_MATHHUB_PROFILE". 
+
+EOF
+
+    printf "MATHHUB_PROFILE="
+    read MATHHUB_PROFILE
+    if [ -z "$MATHHUB_PROFILE" ]
+    then
+        MATHHUB_PROFILE="$SET_MATHHUB_PROFILE"
+    fi;
+    echo "export MATHHUB_PROFILE=$MATHHUB_PROFILE"
+}
+
 function read_mathhub_domain_name() {
     cat << EOF
 When running in a production setup, MathHub needs to know the domain
 name it is running under. Please either enter a domain name now, or
-leave it blank to use "localhost". 
+leave it blank to use "$SET_MATHHUB_DOMAIN_NAME". 
+
 EOF
 
     printf "MATHHUB_DOMAIN_NAME="
     read MATHHUB_DOMAIN_NAME
     if [ -z "$MATHHUB_DOMAIN_NAME" ]
     then
-        MATHHUB_DOMAIN_NAME="localhost"
+        MATHHUB_DOMAIN_NAME="$SET_MATHHUB_DOMAIN_NAME"
     fi;
     echo "export MATHHUB_DOMAIN_NAME=$MATHHUB_DOMAIN_NAME"
 }
@@ -23,10 +73,17 @@ know an email address to register a new Let’s Encrypt account under.
 Please note by entering an email address here, you implicitly agree to
 the Let’s Encrypt subscriber agreement currently found under
 https://letsencrypt.org/documents/2017.11.15-LE-SA-v1.2.pdf. 
+Defaults to "$SET_MATHHUB_SSL_EMAIL".
+
+
 EOF
 
     printf "MATHHUB_SSL_EMAIL="
     read MATHHUB_SSL_EMAIL
+    if [ -z "$MATHHUB_SSL_EMAIL" ]
+    then
+        MATHHUB_SSL_EMAIL="$SET_MATHHUB_SSL_EMAIL"
+    fi;
     echo "export MATHHUB_SSL_EMAIL=$MATHHUB_SSL_EMAIL"
 }
 
@@ -34,17 +91,26 @@ function read_mathhub_secret_key() {
     cat << EOF
 MathHub uses a secret key to safely encrypt session information. The
 production key should be kept strictly secret. Please either enter a
-secret key now, or leave it blank to use "not-production-ready" as a key
-for local development setups. 
+secret key now, or leave it blank to use the saved value of
+"$SET_MATHHUB_SECRET_KEY".
+
 EOF
 
     printf "MATHHUB_SECRET_KEY="
     read MATHHUB_SECRET_KEY
     if [ -z "$MATHHUB_SECRET_KEY" ]
     then
-        MATHHUB_SECRET_KEY="not-production-ready"
+        MATHHUB_SECRET_KEY="$SET_MATHHUB_SECRET_KEY"
     fi;
     echo "export MATHHUB_SECRET_KEY=$MATHHUB_SECRET_KEY"
+}
+
+
+### Writing configuration
+
+function write_mathhub_profile() {
+    cp "profiles/$MATHHUB_PROFILE" .env
+    echo cp "profiles/$MATHHUB_PROFILE" .env
 }
 
 function write_nginx_config() {
@@ -71,13 +137,18 @@ function write_admin_config() {
 }
 
 function write_mmt_config() {
-    touch .conig/mmt
+    touch .config/mmt
 
     echo "Wrote .config/mmt"
 }
 
 function main() {
     echo "MATHHUB DOCKER CONFIGURATION"
+
+    load_prev_config
+
+    echo ""
+    read_mathhub_profile
 
     echo ""
     read_mathhub_domain_name
@@ -93,6 +164,8 @@ function main() {
     
     mkdir -p .config
 
+    save_current_config
+    write_mathhub_profile
     write_nginx_config
     write_compositor_config
     write_admin_config
