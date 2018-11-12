@@ -20,10 +20,10 @@ function load_prev_config() {
 function save_current_config() {
     {
         echo "echo \"Loaded previous settings from $(date)\"";
-        echo "SET_MATHHUB_PROFILE=$MATHHUB_PROFILE"
-        echo "SET_MATHHUB_DOMAIN_NAME=$MATHHUB_DOMAIN_NAME";
-        echo "SET_MATHHUB_SSL_EMAIL=$MATHHUB_SSL_EMAIL";
-        echo "SET_MATHHUB_SECRET_KEY=$MATHHUB_SECRET_KEY";
+        echo "SET_MATHHUB_PROFILE=\"$MATHHUB_PROFILE\""
+        echo "SET_MATHHUB_DOMAIN_NAME=\"$MATHHUB_DOMAIN_NAME\"";
+        echo "SET_MATHHUB_SSL_EMAIL=\"$MATHHUB_SSL_EMAIL\"";
+        echo "SET_MATHHUB_SECRET_KEY=\"$MATHHUB_SECRET_KEY\"";
     } > .config/save
 
     echo "Wrote .config/save"
