@@ -9,6 +9,9 @@ COMPOSITOR_VERSION=latest
 # Version for  mathhub/frontend
 FRONTEND_VERSION=latest
 
+# Version for mathhub/news
+NEWS_VERSION=latest
+
 # Version for mathhub/admin
 ADMIN_VERSION=latest
 

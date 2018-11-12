@@ -77,6 +77,15 @@ services:
       - mhinternal
   
   ##
+  ## The News
+  ##
+  news:
+    image: mathhub/news:${NEWS_VERSION}
+    
+    networks:
+      - mhinternal
+  
+  ##
   ## The Admin Interface
   ##
   admin:
