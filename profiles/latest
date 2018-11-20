@@ -6,6 +6,9 @@ MMT_VERSION=latest
 # Version for compositor
 COMPOSITOR_VERSION=latest
 
+# Version for watchtower
+WATCHTOWER_VERSION=latest
+
 # Version for  mathhub/frontend
 FRONTEND_VERSION=latest
 

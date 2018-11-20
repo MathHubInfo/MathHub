@@ -7,6 +7,7 @@ It consists of several containers, which can roughly be split into two groups:
 - Docker Entry Point and Letsencrypt Setup
     - [jwilder/nginx-proxy](https://github.com/jwilder/nginx-proxy) - entry point taking care of https -> http
     - [jrcs/letsencrypt-nginx-proxy-companion](https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion) - Manages and renews letsencrypt certificates
+    - [v2tec/watchtower](https://github.com/v2tec/watchtower) -- automatic updates
 - MathHub System
     - [mathhub/compositor](https://github.com/MathHubInfo/Compositor) - to delegate access to the containers below
     - [mathhub/frontend](https://github.com/MathHubInfo/Frontend) - to provide a frontend for MathHub

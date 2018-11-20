@@ -14,6 +14,7 @@ function load_prev_config() {
         SET_MATHHUB_PROFILE="latest"
         SET_MATHHUB_DOMAIN_NAME="localhost"
         SET_MATHHUB_SECRET_KEY="not-production-ready"
+        SET_MATHHUB_AUTOUPDATE="none"
     fi;
 }
 
@@ -24,6 +25,7 @@ function save_current_config() {
         echo_save_line "SET_MATHHUB_DOMAIN_NAME" "$MATHHUB_DOMAIN_NAME";
         echo_save_line "SET_MATHHUB_SSL_EMAIL" "$MATHHUB_SSL_EMAIL";
         echo_save_line "SET_MATHHUB_SECRET_KEY" "$MATHHUB_SECRET_KEY";
+        echo_save_line "SET_MATHHUB_AUTOUPDATE" "$MATHHUB_AUTOUPDATE"
     } > .config/save
 
     echo "Wrote .config/save"
@@ -51,6 +53,24 @@ EOF
         MATHHUB_PROFILE="$SET_MATHHUB_PROFILE"
     fi;
     echo "export MATHHUB_PROFILE=$MATHHUB_PROFILE"
+}
+
+function read_mathhub_autoupdate() {
+    cat << EOF
+MathHub can automatically update all components when new versions become 
+available. Please pick one of 'none' (disable auto-update), 'news' 
+(update the News Container only), or 'all' (auto-update everything).
+Defaults to "$SET_MATHHUB_AUTOUPDATE".
+
+EOF
+
+    printf "MATHHUB_AUTOUPDATE="
+    read MATHHUB_AUTOUPDATE
+    if [ -z "$MATHHUB_AUTOUPDATE" ]
+    then
+        MATHHUB_AUTOUPDATE="$SET_MATHHUB_AUTOUPDATE"
+    fi;
+    echo "export MATHHUB_AUTOUPDATE=$MATHHUB_AUTOUPDATE"
 }
 
 function read_mathhub_domain_name() {
@@ -116,7 +136,13 @@ EOF
 
 function write_mathhub_profile() {
     cp "profiles/$MATHHUB_PROFILE" .env
+    echo "" >> .env
     echo cp "profiles/$MATHHUB_PROFILE" .env
+}
+
+function write_autoupdate_config() {
+    cat "updates/$MATHHUB_AUTOUPDATE.update" >> .env
+    echo cat "updates/$MATHHUB_AUTOUPDATE.update" '>> .env'
 }
 
 function write_nginx_config() {
@@ -166,12 +192,16 @@ function main() {
     read_mathhub_secret_key
 
     echo ""
+    read_mathhub_autoupdate
+
+    echo ""
     echo "WRITING CONFIGURATION"
     
     mkdir -p .config
 
     save_current_config
     write_mathhub_profile
+    write_autoupdate_config
     write_nginx_config
     write_compositor_config
     write_admin_config

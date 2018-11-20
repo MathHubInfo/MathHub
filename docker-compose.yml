@@ -10,7 +10,9 @@ services:
       - .config/nginx
     
     labels:
-      "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy": "true"
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
+      
     
     volumes:
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
@@ -34,6 +36,8 @@ services:
   ##
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion:${PROXY_COMPANION_VERSION}
+    labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -58,6 +62,8 @@ services:
       - .config/compositor
     environment:
       - VIRTUAL_PORT=80
+    labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
     networks:
       - mhinternal
@@ -68,10 +74,27 @@ services:
       - portainer
       - mmt
   ##
+  ## WATCHTOWER
+  ##
+  watchtower:
+      image: v2tec/watchtower:${WATCHTOWER_VERSION}
+      labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
+    
+      command: --label-enable --cleanup
+
+      volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      
+      networks:
+        - mhinternal
+  ##
   ## The Frontend
   ##
   frontend:
     image: mathhub/frontend:${FRONTEND_VERSION}
+    labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
     networks:
       - mhinternal
@@ -81,6 +104,8 @@ services:
   ##
   news:
     image: mathhub/news:${NEWS_VERSION}
+    labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_NEWS}
     
     networks:
       - mhinternal
@@ -94,6 +119,8 @@ services:
       - .config/admin
     environment:
       - DJANGO_ALLOWED_HOSTS=*
+    labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
     volumes:
       - "admin:/data/"
@@ -106,6 +133,8 @@ services:
   ##
   portainer:
     image: portainer/portainer:${PORTAINER_VERSION}
+    labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
     command: "--no-auth -H unix:///var/run/docker.sock"
 
@@ -123,6 +152,8 @@ services:
     image: kwarc/mmt:${MMT_VERSION}
     env_file:
       - .config/mmt
+    labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
 
     command: "-w --file /content/MathHub/meta/inf/mathhub.msl"
 
@@ -134,7 +165,7 @@ services:
     
     networks:
       - mhinternal
-
+  
 networks:
   mhinternal:
 
