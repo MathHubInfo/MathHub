@@ -13,7 +13,7 @@ WATCHTOWER_VERSION=latest
 FRONTEND_VERSION=devel
 
 # Version for mathhub/news
-NEWS_VERSION=latest
+NEWS_VERSION=devel
 
 # Version for mathhub/admin
 ADMIN_VERSION=latest
