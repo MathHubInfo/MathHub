@@ -111,7 +111,7 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
-    command: 'NONE'
+    command: 'SHOW_RIBBON'
     
     networks:
       - mhinternal

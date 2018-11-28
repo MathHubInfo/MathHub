@@ -15,6 +15,7 @@ function load_prev_config() {
         SET_MATHHUB_DOMAIN_NAME="localhost"
         SET_MATHHUB_SECRET_KEY="not-production-ready"
         SET_MATHHUB_AUTOUPDATE="none"
+        SET_MATHHUB_RIBBON=""
     fi;
 }
 
@@ -26,6 +27,7 @@ function save_current_config() {
         echo_save_line "SET_MATHHUB_SSL_EMAIL" "$MATHHUB_SSL_EMAIL";
         echo_save_line "SET_MATHHUB_SECRET_KEY" "$MATHHUB_SECRET_KEY";
         echo_save_line "SET_MATHHUB_AUTOUPDATE" "$MATHHUB_AUTOUPDATE"
+        echo_save_line "SET_MATHHUB_RIBBON" "$MATHHUB_RIBBON"
     } > .config/save
 
     echo "Wrote .config/save"
@@ -131,6 +133,22 @@ EOF
     echo "export MATHHUB_SECRET_KEY=$MATHHUB_SECRET_KEY"
 }
 
+function read_mathhub_ribbon() {
+    cat << EOF
+MathHub can show a certain sets of ribbon to indicate to the user
+which version is being used. This should be one of: 'beta', ''.
+
+The default is "$SET_MATHHUB_RIBBON". 
+EOF
+
+    printf "MATHHUB_RIBBON="
+    read MATHHUB_RIBBON
+    if [ -z "$MATHHUB_RIBBON" ]
+    then
+        MATHHUB_RIBBON="$SET_MATHHUB_RIBBON"
+    fi;
+    echo "export MATHHUB_RIBBON=$MATHHUB_RIBBON"
+}
 
 ### Writing configuration
 
@@ -175,7 +193,7 @@ function write_mmt_config() {
 }
 
 function write_config_config() {
-    touch .config/letitgo
+    echo "SHOW_RIBBON=$MATHHUB_RIBBON" > .config/letitgo
     
     echo "Wrote .config/letitgo"
 }
@@ -196,6 +214,9 @@ function main() {
 
     echo ""
     read_mathhub_secret_key
+
+    echo ""
+    read_mathhub_ribbon
 
     echo ""
     read_mathhub_autoupdate
