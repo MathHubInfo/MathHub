@@ -72,6 +72,8 @@ services:
       - frontend
       - admin
       - portainer
+      - news
+      - config
       - mmt
   ##
   ## WATCHTOWER
