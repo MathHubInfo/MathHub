@@ -174,6 +174,12 @@ function write_mmt_config() {
     echo "Wrote .config/mmt"
 }
 
+function write_config_config() {
+    touch .config/letitgo
+    
+    echo "Wrote .config/letitgo"
+}
+
 function main() {
     echo "MATHHUB DOCKER CONFIGURATION"
 
@@ -206,6 +212,7 @@ function main() {
     write_compositor_config
     write_admin_config
     write_mmt_config
+    write_config_config
     echo "Done. "
 }
 

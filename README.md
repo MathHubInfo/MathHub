@@ -11,6 +11,7 @@ It consists of several containers, which can roughly be split into two groups:
 - MathHub System
     - [mathhub/compositor](https://github.com/MathHubInfo/Compositor) - to delegate access to the containers below
     - [mathhub/frontend](https://github.com/MathHubInfo/Frontend) - to provide a frontend for MathHub
+    - [mathhub/letitgo](https://github.com/MathHubInfo/LetIt.Go) - to provide frontend configuration for MathHub
     - [mathhub/news](https://github.com/MathHubInfo/News) - to provide a news ticker for MathHub
     - [kwarc/mmt](https://github.com/Uniformal/MMT) - to provide a backend for MathHub
     - [mathhub/admin](https://github.com/MathHubInfo/Admin) - to provide an Admin interface

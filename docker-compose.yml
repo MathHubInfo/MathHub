@@ -100,6 +100,21 @@ services:
       - mhinternal
   
   ##
+  ## The Config
+  ##
+  config:
+    image: mathhub/letitgo:${LETITGO_VERSION}
+    env_file:
+      - .config/letitgo
+    labels:
+      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
+    
+    command: 'NONE'
+    
+    networks:
+      - mhinternal
+  
+  ##
   ## The News
   ##
   news:

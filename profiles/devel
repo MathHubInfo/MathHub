@@ -12,6 +12,9 @@ WATCHTOWER_VERSION=latest
 # Version for  mathhub/frontend
 FRONTEND_VERSION=devel
 
+# Version for mathhub/letitgo
+LETITGO_VERSION=latest
+
 # Version for mathhub/news
 NEWS_VERSION=devel
 
