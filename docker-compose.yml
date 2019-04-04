@@ -30,6 +30,8 @@ services:
     networks:
       - mhinternal
       - default
+    
+    restart: always
   
   ##
   ## Letsencrypt-Companion
@@ -51,6 +53,8 @@ services:
     
     networks:
       - mhinternal
+    
+    restart: always
 
   ##
   ## The Compositor
@@ -75,6 +79,8 @@ services:
       - news
       - config
       - mmt
+    
+    restart: always
   ##
   ## WATCHTOWER
   ##
@@ -90,6 +96,8 @@ services:
       
       networks:
         - mhinternal
+    
+      restart: always
   ##
   ## The Frontend
   ##
@@ -100,6 +108,8 @@ services:
     
     networks:
       - mhinternal
+    
+    restart: always
   
   ##
   ## The Config
@@ -115,6 +125,8 @@ services:
     
     networks:
       - mhinternal
+    
+    restart: always
   
   ##
   ## The News
@@ -126,6 +138,8 @@ services:
     
     networks:
       - mhinternal
+    
+    restart: always
   
   ##
   ## The Admin Interface
@@ -144,6 +158,8 @@ services:
 
     networks:
       - mhinternal
+    
+    restart: always
   
   ##
   ## Portainer
@@ -161,6 +177,8 @@ services:
     
     networks:
       - mhinternal
+    
+    restart: always
   
   ##
   ## MMT
@@ -182,6 +200,8 @@ services:
     
     networks:
       - mhinternal
+    
+    restart: always
   
 networks:
   mhinternal:
