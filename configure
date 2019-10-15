@@ -11,8 +11,9 @@ function load_prev_config() {
     # else load some defaults
     else
         echo "No saved settings found, loading defaults for local development setup. "
+        SET_MATHHUB_PORT="80"
         SET_MATHHUB_PROFILE="latest"
-        SET_MATHHUB_DOMAIN_NAME="localhost"
+        SET_MATHHUB_UUID="local"
         SET_MATHHUB_SECRET_KEY="not-production-ready"
         SET_MATHHUB_AUTOUPDATE="none"
         SET_MATHHUB_RIBBON=""
@@ -22,10 +23,10 @@ function load_prev_config() {
 function save_current_config() {
     {
         echo "echo \"Loaded previous settings from $(date)\"";
-        echo_save_line "SET_MATHHUB_PROFILE" "$MATHHUB_PROFILE";
-        echo_save_line "SET_MATHHUB_DOMAIN_NAME" "$MATHHUB_DOMAIN_NAME";
-        echo_save_line "SET_MATHHUB_SSL_EMAIL" "$MATHHUB_SSL_EMAIL";
-        echo_save_line "SET_MATHHUB_SECRET_KEY" "$MATHHUB_SECRET_KEY";
+        echo_save_line "SET_MATHHUB_PROFILE" "$MATHHUB_PROFILE"
+        echo_save_line "SET_MATHHUB_PORT" "$MATHHUB_PORT"
+        echo_save_line "SET_MATHHUB_UUID" "$MATHHUB_UUID"
+        echo_save_line "SET_MATHHUB_SECRET_KEY" "$MATHHUB_SECRET_KEY"
         echo_save_line "SET_MATHHUB_AUTOUPDATE" "$MATHHUB_AUTOUPDATE"
         echo_save_line "SET_MATHHUB_RIBBON" "$MATHHUB_RIBBON"
     } > .config/save
@@ -57,6 +58,38 @@ EOF
     echo "export MATHHUB_PROFILE=$MATHHUB_PROFILE"
 }
 
+function read_mathhub_uuid() {
+    cat << EOF
+MathHub requires a per-host-unique UUID to scope particular docker
+services appropriatly. Please enter one now or leave this question
+blank to use "$SET_MATHHUB_UUID".
+EOF
+
+    printf "MATHHUB_UUID="
+    read MATHHUB_UUID
+    if [ -z "$MATHHUB_UUID" ]
+    then
+        MATHHUB_UUID="$SET_MATHHUB_UUID"
+    fi;
+    echo "export MATHHUB_UUID=$MATHHUB_UUID"
+}
+
+function read_mathhub_port() {
+    cat << EOF
+MathHub requires a public port to listen on. Please enter one now or
+leave this question blank to use "$SET_MATHHUB_PORT".
+EOF
+
+    printf "MATHHUB_PORT="
+    read MATHHUB_PORT
+    if [ -z "$MATHHUB_PORT" ]
+    then
+        MATHHUB_PORT="$SET_MATHHUB_PORT"
+    fi;
+    echo "export MATHHUB_PORT=$MATHHUB_PORT"
+}
+
+
 function read_mathhub_autoupdate() {
     cat << EOF
 MathHub can automatically update all components when new versions become 
@@ -73,44 +106,6 @@ EOF
         MATHHUB_AUTOUPDATE="$SET_MATHHUB_AUTOUPDATE"
     fi;
     echo "export MATHHUB_AUTOUPDATE=$MATHHUB_AUTOUPDATE"
-}
-
-function read_mathhub_domain_name() {
-    cat << EOF
-When running in a production setup, MathHub needs to know the domain
-name it is running under. Please either enter a domain name now, or
-leave it blank to use "$SET_MATHHUB_DOMAIN_NAME". 
-
-EOF
-
-    printf "MATHHUB_DOMAIN_NAME="
-    read MATHHUB_DOMAIN_NAME
-    if [ -z "$MATHHUB_DOMAIN_NAME" ]
-    then
-        MATHHUB_DOMAIN_NAME="$SET_MATHHUB_DOMAIN_NAME"
-    fi;
-    echo "export MATHHUB_DOMAIN_NAME=$MATHHUB_DOMAIN_NAME"
-}
-
-function read_mathhub_ssl_email() {
-    cat << EOF
-If SSL Certificates should be automatically retrieved, MathHub needs to
-know an email address to register a new Let’s Encrypt account under.
-Please note by entering an email address here, you implicitly agree to
-the Let’s Encrypt subscriber agreement currently found under
-https://letsencrypt.org/documents/2017.11.15-LE-SA-v1.2.pdf. 
-Defaults to "$SET_MATHHUB_SSL_EMAIL".
-
-
-EOF
-
-    printf "MATHHUB_SSL_EMAIL="
-    read MATHHUB_SSL_EMAIL
-    if [ -z "$MATHHUB_SSL_EMAIL" ]
-    then
-        MATHHUB_SSL_EMAIL="$SET_MATHHUB_SSL_EMAIL"
-    fi;
-    echo "export MATHHUB_SSL_EMAIL=$MATHHUB_SSL_EMAIL"
 }
 
 function read_mathhub_secret_key() {
@@ -158,26 +153,19 @@ function write_mathhub_profile() {
     echo cp "profiles/$MATHHUB_PROFILE" .env
 }
 
+function write_env() {
+    echo "" >> .env
+    echo "# Instance UUID" >> .env
+    echo "MATHHUB_UUID=$MATHHUB_UUID" >> .env
+    echo "# MathHub Port" >> .env
+    echo "MATHHUB_PORT=$MATHHUB_PORT" >> .env
+    echo "" >> .env
+    echo "Wrote .env"
+}
+
 function write_autoupdate_config() {
     cat "updates/$MATHHUB_AUTOUPDATE.update" >> .env
     echo cat "updates/$MATHHUB_AUTOUPDATE.update" '>> .env'
-}
-
-function write_nginx_config() {
-    echo "DEFAULT_HOST=$MATHHUB_DOMAIN_NAME" > .config/nginx
-
-    echo "Wrote .config/nginx"
-}
-
-function write_compositor_config() {
-    echo "VIRTUAL_HOST=$MATHHUB_DOMAIN_NAME" > .config/compositor
-
-    if [ ! -z "$MATHHUB_SSL_EMAIL" ]; then
-        echo "LETSENCRYPT_HOST=$MATHHUB_DOMAIN_NAME" >> .config/compositor
-        echo "LETSENCRYPT_EMAIL=$MATHHUB_SSL_EMAIL"  >> .config/compositor
-    fi;
-
-    echo "Wrote .config/compositor"
 }
 
 function write_admin_config() {
@@ -204,13 +192,13 @@ function main() {
     load_prev_config
 
     echo ""
+    read_mathhub_uuid
+
+    echo ""
     read_mathhub_profile
 
     echo ""
-    read_mathhub_domain_name
-
-    echo ""
-    read_mathhub_ssl_email
+    read_mathhub_port
 
     echo ""
     read_mathhub_secret_key
@@ -229,8 +217,7 @@ function main() {
     save_current_config
     write_mathhub_profile
     write_autoupdate_config
-    write_nginx_config
-    write_compositor_config
+    write_env
     write_admin_config
     write_mmt_config
     write_config_config

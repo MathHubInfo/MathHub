@@ -2,76 +2,21 @@ version: '3.6'
 
 services:
   ##
-  ## Nginx entry point
-  ##
-  nginx:
-    image: jwilder/nginx-proxy:${NGINX_PROXY_VERSION}
-    env_file:
-      - .config/nginx
-    
-    labels:
-      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true
-      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
-      
-    
-    volumes:
-      - "/var/run/docker.sock:/tmp/docker.sock:ro"
-      - "nginx_dhparam:/etc/nginx/dhparam"
-      - "nginx_html:/usr/share/nginx/html"
-      - "nginx_vhost:/etc/nginx/vhost.d"
-      - "nginx_certs:/etc/nginx/certs"
-       
-    depends_on:
-    - compositor
-    
-    ports:
-      - "80:80"
-      - "443:443"
-    networks:
-      - mhinternal
-      - default
-    
-    restart: always
-  
-  ##
-  ## Letsencrypt-Companion
-  ##
-  letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion:${PROXY_COMPANION_VERSION}
-    labels:
-      - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
-    
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "nginx_dhparam:/etc/nginx/dhparam"
-      - "nginx_html:/usr/share/nginx/html"
-      - "nginx_vhost:/etc/nginx/vhost.d"
-      - "nginx_certs:/etc/nginx/certs"
-
-    depends_on:
-      - nginx
-    
-    networks:
-      - mhinternal
-    
-    restart: always
-
-  ##
   ## The Compositor
   ##
 
   compositor:
     image: mathhub/compositor:${COMPOSITOR_VERSION}
-    env_file:
-      - .config/compositor
-    environment:
-      - VIRTUAL_PORT=80
+    container_name: mh_compositor_${MATHHUB_UUID}
     labels:
       - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
+    ports:
+      - target: 80
+        published: ${MATHHUB_PORT}
     
     networks:
       - mhinternal
-    
+        
     depends_on:
       - frontend
       - admin
@@ -86,10 +31,11 @@ services:
   ##
   watchtower:
       image: v2tec/watchtower:${WATCHTOWER_VERSION}
+      container_name: mh_watchtower_${MATHHUB_UUID}
       labels:
       - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
-      command: --label-enable --cleanup
+      command: --label-enable --cleanup mh_nginx_${MATHHUB_UUID} mh_compositor_${MATHHUB_UUID} mh_watchtower_${MATHHUB_UUID} mh_frontend_${MATHHUB_UUID} mh_letitgo_${MATHHUB_UUID} mh_news_${MATHHUB_UUID} mh_admin_${MATHHUB_UUID} mh_portainer_${MATHHUB_UUID} mh_mmt_${MATHHUB_UUID}
 
       volumes:
         - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -103,6 +49,7 @@ services:
   ##
   frontend:
     image: mathhub/frontend:${FRONTEND_VERSION}
+    container_name: mh_frontend_${MATHHUB_UUID}
     labels:
       - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
@@ -116,6 +63,7 @@ services:
   ##
   config:
     image: mathhub/letitgo:${LETITGO_VERSION}
+    container_name: mh_letitgo_${MATHHUB_UUID}
     env_file:
       - .config/letitgo
     labels:
@@ -133,6 +81,7 @@ services:
   ##
   news:
     image: mathhub/news:${NEWS_VERSION}
+    container_name: mh_news_${MATHHUB_UUID}
     labels:
       - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_NEWS}
     
@@ -146,6 +95,7 @@ services:
   ##
   admin:
     image: mathhub/admin:${ADMIN_VERSION}
+    container_name: mh_admin_${MATHHUB_UUID}
     env_file:
       - .config/admin
     environment:
@@ -166,6 +116,7 @@ services:
   ##
   portainer:
     image: portainer/portainer:${PORTAINER_VERSION}
+    container_name: mh_portainer_${MATHHUB_UUID}
     labels:
       - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
@@ -185,6 +136,7 @@ services:
   ##
   mmt:
     image: kwarc/mmt:${MMT_VERSION}
+    container_name: mh_mmt_${MATHHUB_UUID}
     env_file:
       - .config/mmt
     labels:
