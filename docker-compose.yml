@@ -15,7 +15,9 @@ services:
         published: ${MATHHUB_PORT}
     
     networks:
-      - mhinternal
+      mhinternal:
+        aliases:
+          - compositor
         
     depends_on:
       - frontend
@@ -41,7 +43,9 @@ services:
         - "/var/run/docker.sock:/var/run/docker.sock:ro"
       
       networks:
-        - mhinternal
+        mhinternal:
+          aliases:
+            - watchtower
     
       restart: always
   ##
@@ -54,7 +58,9 @@ services:
       - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_OTHER}
     
     networks:
-      - mhinternal
+      mhinternal:
+        aliases:
+          - watchtower
     
     restart: always
   
@@ -72,7 +78,9 @@ services:
     command: 'SHOW_RIBBON'
     
     networks:
-      - mhinternal
+      mhinternal:
+        aliases:
+          - config
     
     restart: always
   
@@ -86,7 +94,9 @@ services:
       - com.centurylinklabs.watchtower.enable=${AUTO_UPDATE_NEWS}
     
     networks:
-      - mhinternal
+      mhinternal:
+        aliases:
+          - news
     
     restart: always
   
@@ -107,7 +117,9 @@ services:
       - "admin:/data/"
 
     networks:
-      - mhinternal
+      mhinternal:
+        aliases:
+          - admin
     
     restart: always
   
@@ -127,7 +139,9 @@ services:
       - "portainer:/data/"
     
     networks:
-      - mhinternal
+      mhinternal:
+        aliases:
+          - portainer
     
     restart: always
   
@@ -151,7 +165,9 @@ services:
       - mmt:/content/
     
     networks:
-      - mhinternal
+      mhinternal:
+        aliases:
+          - mmt
     
     restart: always
   
