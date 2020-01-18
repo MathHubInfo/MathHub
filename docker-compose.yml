@@ -159,7 +159,7 @@ services:
     command: "-w --file /content/meta/inf/mathhub.msl"
 
     environment:
-      MMT_ARCHIVES: meta/inf HelloWorld/* smglom/* MMT/LFX MMT/urtheories MMT/examples MitM/meta-inf MitM/Foundation MitM/core MitM/models ODK/meta-inf ODK/lmfdb ODK/GAP ODK/Sage ODK/Sage ODK/Singular ODK/knowls ODK/math ODK/Demos Isabelle/* Tutorials/Mathematicians
+      MMT_ARCHIVES: meta/inf HelloWorld/* smglom/* MMT/LFX MMT/urtheories MMT/examples MitM/meta-inf MitM/Foundation MitM/core ODK/meta-inf ODK/lmfdb ODK/GAP ODK/Sage ODK/Sage ODK/Singular ODK/knowls ODK/math ODK/Demos Isabelle/* Tutorials/Mathematicians
 
     volumes:
       - mmt:/content/
